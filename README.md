@@ -1,4 +1,4 @@
-# STM32 Bare-Metal ESC Firmware
+# stm32-bluepill-baremetal-telemetry
 
 Bare-metal sensorless BLDC ESC firmware for the STM32F103C8T6 (Blue Pill), written directly against the register map — no HAL, no CMSIS drivers.
 
