@@ -1,117 +1,44 @@
 # STM32 Bare-Metal ESC Firmware
 
-This repository contains a bare-metal ESC firmware project based on the STM32F103C8T6.
-
-The project is focused on understanding and implementing the firmware side of a sensorless BLDC ESC. Rather than building separate examples for GPIO, timers, PWM, or ADC, these peripherals will be developed as part of the actual ESC firmware.
+Bare-metal sensorless BLDC ESC firmware for the STM32F103C8T6 (Blue Pill), written directly against the register map — no HAL, no CMSIS drivers.
 
 ## Target
-
 - MCU: STM32F103C8T6
 - Core: ARM Cortex-M3
 - Language: C
-- Development approach: Bare-metal and register-level programming
+- Board: Blue Pill
 
-## Project Scope
+## What it does
+- Reads RC throttle signal (1000–2000us) via input capture
+- Generates 3-phase PWM (~20kHz) for the high side, GPIO for the low side
+- Spins the motor up open-loop, then hands off to sensorless BEMF commutation
+- Calculates RPM from commutation timing
+- Reads bus voltage, current, and onboard temperature via ADC
+- Shows live telemetry on an SSD1306 OLED (bit-banged I2C)
+- Blinks the onboard LED (PC13) every 2s as a heartbeat / alive check
 
-The firmware will cover the main parts of an ESC, including:
+## Pin Map
+| Pin | Function |
+|---|---|
+| PA8/PA9/PA10 | TIM1 PWM — phase A/B/C high side |
+| PB0/PB1/PB10 | Phase A/B/C low side (GPIO) |
+| PA4/PA5/PA6 | BEMF sense — phase A/B/C |
+| PA1 | Bus voltage sense |
+| PA2 | Current sense |
+| PA0 | RC throttle input capture |
+| PB6/PB7 | I2C SCL/SDA — OLED |
+| PC13 | Onboard LED (heartbeat) |
 
-- ESC state management
-- PWM generation and duty-cycle control
-- Controlled duty-cycle ramping
-- Sensorless commutation
-- Back-EMF sensing
-- Rotor position detection
-- RPM calculation
-- Current measurement using onboard current-sense circuitry
-- Voltage measurement using onboard voltage-sensing circuitry
-- Temperature measurement using an onboard NTC or thermistor
-- ADC data acquisition
-- Telemetry handling
-- Fault detection and protection
+## Timing
+Two separate timebases on purpose: a microsecond timer (TIM4) for anything commutation-related where precision matters, and a millisecond timer (SysTick/`millis()`) for everything else — arming, telemetry refresh, LED blink.
 
-The goal is to build the firmware as a complete system instead of treating each peripheral as an isolated learning exercise.
+## Not done yet
+- Over-current / over-temperature protection
+- Duty-cycle rate limiting during normal run
+- Testing on an actual motor with a real gate driver stage
 
-## Sensing and Measurement
-
-The project distinguishes between values that are directly measured and values that are calculated from those measurements.
-
-### Back-EMF and RPM
-
-A separate RPM sensor is not required in a sensorless BLDC system.
-
-The motor phases are monitored for back-EMF information. This can be used to determine rotor position and commutation timing. The time between electrical events can then be used to calculate motor speed.
-
-### Current
-
-Current is measured using an onboard current-sensing circuit. Depending on the hardware design, this may include a shunt resistor and analog signal conditioning before the signal reaches the ADC.
-
-The firmware is responsible for reading, converting, filtering, and using this data for control and protection.
-
-### Voltage
-
-Supply voltage is measured through onboard voltage-sensing circuitry, typically using a voltage divider connected to an ADC channel.
-
-The firmware converts the ADC value into the actual supply voltage.
-
-### Temperature
-
-Temperature is measured using an onboard NTC or thermistor connected to an ADC channel.
-
-The firmware converts the measured ADC value into a temperature value and uses it for monitoring and protection.
-
-## PWM Control
-
-PWM is one of the main parts of the ESC firmware.
-
-The control flow is expected to follow this general path:
-
-Control command
-
-↓
-
-Target duty cycle
-
-↓
-
-Duty-cycle ramping or rate limiting
-
-↓
-
-PWM timer update
-
-↓
-
-Power stage control
-
-The duty cycle will not simply jump between arbitrary values. The firmware will implement controlled changes based on the current state and operating conditions.
-
-## Firmware Direction
-
-The firmware will gradually be structured around the following areas:
-
-- Core system initialization
-- Clock configuration
-- GPIO control
-- Timers and PWM
-- ADC and signal acquisition
-- Interrupt handling
-- ESC state machine
-- Motor startup
-- Commutation control
-- Back-EMF processing
-- Current, voltage, and temperature processing
-- RPM calculation
-- Telemetry
-- Fault handling and protection
-
-These modules will be added only when they are needed by the firmware.
-
-## Project Goal
-
-The main goal of this project is to build a clean and understandable bare-metal ESC firmware codebase from the ground up.
-
-The project is intended to improve my understanding of embedded firmware, real-time control, STM32 peripherals, and sensorless BLDC motor control while producing a publicly shareable project that demonstrates practical firmware development.
+## Disclaimer
+Logic-level outputs only — needs a proper gate driver / half-bridge stage before touching a real motor. BEMF threshold is a fixed mid-scale value and will need tuning for your hardware.
 
 ## Status
-
-Work in progress.
+Work in progress. Core control loop, sensing, and telemetry are working on the bench. Protection and real motor testing are next.
