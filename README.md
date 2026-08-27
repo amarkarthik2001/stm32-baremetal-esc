@@ -1,6 +1,6 @@
 stm32-bluepill-baremetal-telemetry
 
-Bare-metal onboard telemetry firmware for the STM32F103C8T6 (Blue Pill), written directly against the register map — no HAL, no CMSIS drivers.
+Bare-metal onboard telemetry firmware for the STM32F103C8T6 (Blue Pill), written directly against the register map - no HAL, no CMSIS drivers.
 
 Target
 MCU: STM32F103C8T6
@@ -16,7 +16,7 @@ Blinks the onboard LED (PC13) every 1s as a heartbeat / alive check
 Pin Map
 Pin	Function
 PA2	Current sense (raw ADC voltage, needs external shunt/amp)
-PB6/PB7	I2C SCL/SDA — OLED
+PB6/PB7	I2C SCL/SDA - OLED
 PC13	Onboard LED (heartbeat)
 Timing
 
@@ -28,7 +28,7 @@ Temperature calibration offset (F103 has no factory calibration for the internal
 Any protection thresholds (over-voltage, over-current, over-temp)
 Disclaimer
 
-VOLT and TEMP are read straight from the chip's own internal sensors, so they work with zero external wiring. CURR is just the raw voltage seen on PA2 — if nothing's wired to that pin, it'll read noisy, meaningless values. That's expected, not a bug.
+VOLT and TEMP are read straight from the chip's own internal sensors, so they work with zero external wiring. CURR is just the raw voltage seen on PA2 - if nothing's wired to that pin, it'll read noisy, meaningless values. That's expected, not a bug.
 
 Status
 
