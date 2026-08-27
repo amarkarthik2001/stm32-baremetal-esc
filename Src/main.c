@@ -222,6 +222,7 @@ static void oled_char(char c)
     static const uint8_t d8[] = {0x36,0x49,0x49,0x49,0x36};
     static const uint8_t d9[] = {0x06,0x49,0x49,0x29,0x1E};
     static const uint8_t cA[] = {0x7E,0x11,0x11,0x11,0x7E};
+    static const uint8_t cB[] = {0x7F,0x49,0x49,0x49,0x36};
     static const uint8_t cC[] = {0x3E,0x41,0x41,0x41,0x22};
     static const uint8_t cE[] = {0x7F,0x49,0x49,0x49,0x41};
     static const uint8_t cI[] = {0x00,0x41,0x7F,0x41,0x00};
@@ -253,6 +254,7 @@ static void oled_char(char c)
         case '8': f = d8; break;
         case '9': f = d9; break;
         case 'A': f = cA; break;
+        case 'B': f = cB; break;
         case 'C': f = cC; break;
         case 'E': f = cE; break;
         case 'I': f = cI; break;
